@@ -5,6 +5,7 @@ import random
 import asyncio
 import functools
 import traceback
+from sybil_engine.utils.decryptor import decrypt_private_key
 
 import msoffcrypto
 import pandas as pd
@@ -19,7 +20,7 @@ from settings import (
     SLEEP_TIME_RETRY,
     MAXIMUM_RETRY,
     EXCEL_PASSWORD,
-    EXCEL_PAGE_NAME
+    EXCEL_PAGE_NAME, ENCRYPTION, ENCRYPTION_PASSWORD
 )
 
 
@@ -74,6 +75,9 @@ def get_accounts_data(page_name:str = None):
             account_name = row["Name"]
             private_key = row["Private Key"]
             private_key_evm = row["Private Key EVM"] if GLOBAL_NETWORK == 9 else 0x123
+            if ENCRYPTION:
+                private_key = decrypt_private_key(private_key, ENCRYPTION_PASSWORD)
+
             proxy = row["Proxy"]
             cex_address = row['CEX address']
             accounts_data[int(index) + 1] = {
